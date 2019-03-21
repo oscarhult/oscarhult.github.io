@@ -1,15 +1,53 @@
 <!DOCTYPE html>
-<html lang="en">
-
+<html>
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>oscarhult.github.io</title>
+	<style>
+		html, body, #map {width: 100%;height: 100%;margin: 0;padding: 0;border: 0;}
+		#create {position: fixed;top: 50px;left: 50%;margin: 0;margin-left: -100px;border: 0;font-family: sans-serif;padding: 0;width: 200px;height: 40px;background-color: #25e;border-radius: 5px;line-height: 42px;color: #fff;text-align: center;cursor: pointer;}
+		#create:hover {background-color: #648bff;}
+	</style>
 </head>
-
 <body>
-    oscarhult.github.io
+	<div id="map"></div>
+	<div id="create" onclick="createGpx()">DOWNLOAD GPX</div>
+	<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAWJgPjP2KunWOHLAXi35vhh15R2vtE8Rc"></script>
+	<script>
+		var coordinates = new Array();
+		document.addEventListener('DOMContentLoaded', function () {
+			coordinates.push('<?xml version="1.0" encoding="UTF-8" standalone="no" ?>');
+			coordinates.push('<gpx xmlns="http://www.topografix.com/GPX/1/1" xmlns:gpxx="http://www.garmin.com/xmlschemas/GpxExtensions/v3" xmlns:gpxtpx="http://www.garmin.com/xmlschemas/TrackPointExtension/v1" version="1.1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.topografix.com/GPX/1/1 http://www.topografix.com/GPX/1/1/gpx.xsd http://www.garmin.com/xmlschemas/GpxExtensions/v3 http://www.garmin.com/xmlschemas/GpxExtensionsv3.xsd http://www.garmin.com/xmlschemas/TrackPointExtension/v1 http://www.garmin.com/xmlschemas/TrackPointExtensionv1.xsd">');
+			var hide = [{ featureType: "all", elementType: "labels", stylers: [{ visibility: "off" }] }];
+			var map = new google.maps.Map(document.getElementById('map'), {
+				zoom: 19,
+				minZoom: 1,
+				maxZoom: 19,
+				center: { lat: 59.37050804589716, lng: 18.003527664532953 },
+				mapTypeId: 'hide',
+				disableDoubleClickZoom: true,
+			});
+			map.mapTypes.set('hide', new google.maps.StyledMapType(hide, { name: 'hide' }));
+			map.addListener('click', function (event) {
+				coordinates.push('<wpt lat="' + event.latLng.lat() + '" lon="' + event.latLng.lng() + '"><name>WP' + coordinates.length + '</name></wpt>');
+				var marker = new google.maps.Marker({
+					position: event.latLng,
+					icon: { path: google.maps.SymbolPath.CIRCLE, scale: 3 },
+					draggable: false,
+					map: map
+				});
+			});
+		});
+		function createGpx() {
+			coordinates.push('</gpx>');
+			var data = new Blob(coordinates);
+			var downloadLink = document.createElement('a');
+			downloadLink.setAttribute('download', 'coordinates.gpx');
+			downloadLink.setAttribute('id', 'coordinates');
+			document.body.appendChild(downloadLink);
+			downloadLink.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(data));
+			downloadLink.href = URL.createObjectURL(data);
+			downloadLink.style.display = 'none';
+			downloadLink.click();
+		}
+	</script>
 </body>
-
 </html>
