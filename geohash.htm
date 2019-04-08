@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <style>
+      #map * {
+        cursor: default !important;
+      }
+      html,
+      body,
+      #map {
+        width: 100%;
+        height: 100%;
+        margin: 0;
+        padding: 0;
+        border: 0;
+      }
+      .create {
+        position: fixed;
+        left: 50%;
+        margin: 0;
+        border: 0;
+        font-family: sans-serif;
+        padding: 0;
+        width: 200px;
+        height: 40px;
+        background-color: #25e;
+        border-radius: 5px;
+        line-height: 42px;
+        color: #fff;
+        text-align: center;
+        cursor: pointer;
+      }
+      .create:hover {
+        background-color: #648bff;
+      }
+      #create1 {
+        top: 50px;
+        margin-left: -205px;
+      }
+      #create2 {
+        top: 100px;
+        margin-left: -205px;
+      }
+      #create3 {
+        top: 50px;
+        margin-left: 5px;
+      }
+      #create4 {
+        top: 100px;
+        margin-left: 5px;
+        background-color: #e25;
+      }
+      #create4:hover {
+        background-color: #ff648b;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="map"></div>
+    <div class="create" id="create1" onclick="createGpx(false)">
+      DOWNLOAD GPX
+    </div>
+    <div class="create" id="create2" onclick="createGpx(true)">
+      REVERSE + DOWNLOAD
+    </div>
+    <div class="create" id="create3" onclick="getUrl()">
+      GET URL
+    </div>
+    <div class="create" id="create4" onclick="reset()">
+      RESET
+    </div>
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBxbRlqqOTti0NQbLiEjdVNmwRpOoCbEtQ"></script>
+    <script src="geohash.js"></script>
+    <script>
+      const coordinates = [];
+      document.addEventListener("DOMContentLoaded", function() {
+        var hide = [
+          {
+            featureType: "all",
+            elementType: "labels",
+            stylers: [{ visibility: "off" }]
+          }
+        ];
+        var map = new google.maps.Map(document.getElementById("map"), {
+          zoom: 19,
+          minZoom: 1,
+          maxZoom: 19,
+          center: { lat: 59.37050804589716, lng: 18.003527664532953 },
+          mapTypeId: "hide",
+          disableDoubleClickZoom: true
+        });
+        map.mapTypes.set(
+          "hide",
+          new google.maps.StyledMapType(hide, { name: "hide" })
+        );
+        map.addListener("click", function(event) {
+          coordinates.push(
+            encodeGeoHash(event.latLng.lat(), event.latLng.lng())
+          );
+          var marker = new google.maps.Marker({
+            position: event.latLng,
+            icon: { path: google.maps.SymbolPath.CIRCLE, scale: 3 },
+            draggable: false,
+            map: map
+          });
+        });
+        if (window.location.search) {
+          var search = new URLSearchParams(window.location.search);
+          search
+            .get("c")
+            .split(",")
+            .forEach(h => {
+              coordinates.push(h);
+              let c = decodeGeoHash(h);
+              var marker = new google.maps.Marker({
+                position: c,
+                icon: { path: google.maps.SymbolPath.CIRCLE, scale: 3 },
+                draggable: false,
+                map: map
+              });
+            });
+        }
+      });
+      function createGpx(reverse) {
+        let gpx = [];
+        gpx.push(`<?xml version="1.0" encoding="UTF-8" standalone="no" ?>`);
+        gpx.push(
+          `<gpx xmlns="http://www.topografix.com/GPX/1/1" xmlns:gpxx="http://www.garmin.com/xmlschemas/GpxExtensions/v3" xmlns:gpxtpx="http://www.garmin.com/xmlschemas/TrackPointExtension/v1" version="1.1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.topografix.com/GPX/1/1 http://www.topografix.com/GPX/1/1/gpx.xsd http://www.garmin.com/xmlschemas/GpxExtensions/v3 http://www.garmin.com/xmlschemas/GpxExtensionsv3.xsd http://www.garmin.com/xmlschemas/TrackPointExtension/v1 http://www.garmin.com/xmlschemas/TrackPointExtensionv1.xsd">`
+        );
+        coordinates.forEach((h, i) => {
+          let c = decodeGeoHash(h);
+          gpx.push(
+            `<wpt lat="${c.lat}" lon="${c.lng}"><name>WP${i}</name></wpt>`
+          );
+        });
+        if (reverse) {
+          coordinates.reverse().forEach((h, i) => {
+            let c = decodeGeoHash(h);
+            gpx.push(
+              `<wpt lat="${c.lat}" lon="${c.lng}"><name>WP${coordinates.length +
+                i}</name></wpt>`
+            );
+          });
+        }
+        gpx.push(`</gpx>`);
+        var data = new Blob(gpx, { type: "text/plain" });
+        var downloadLink = document.createElement("a");
+        downloadLink.href = URL.createObjectURL(data);
+        downloadLink.setAttribute("download", "coordinates.gpx");
+        downloadLink.click();
+      }
+      function getUrl() {
+        window.location = `${
+          window.location.href.split("?")[0]
+        }?c=${coordinates.toString()}`;
+      }
+      function reset() {
+        window.location = `${window.location.href.split("?")[0]}`;
+      }
+    </script>
+  </body>
+</html>
