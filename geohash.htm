@@ -74,6 +74,15 @@
     <script>
       const coordinates = [];
       document.addEventListener("DOMContentLoaded", function() {
+        if (window.location.search) {
+          var search = new URLSearchParams(window.location.search);
+          search
+            .get("c")
+            .split(",")
+            .forEach(h => {
+              coordinates.push(h);
+            });
+        }
         var hide = [
           {
             featureType: "all",
@@ -81,11 +90,18 @@
             stylers: [{ visibility: "off" }]
           }
         ];
+        var latLng;
+        if (coordinates.length > 0) {
+          latLng = decodeGeoHash(coordinates[0]);
+        }
+        else{
+          latLng = { lat: 59.37050804589716, lng: 18.003527664532953 };
+        }
         var map = new google.maps.Map(document.getElementById("map"), {
           zoom: 19,
           minZoom: 1,
           maxZoom: 19,
-          center: { lat: 59.37050804589716, lng: 18.003527664532953 },
+          center: latLng,
           mapTypeId: "hide",
           disableDoubleClickZoom: true
         });
@@ -104,22 +120,15 @@
             map: map
           });
         });
-        if (window.location.search) {
-          var search = new URLSearchParams(window.location.search);
-          search
-            .get("c")
-            .split(",")
-            .forEach(h => {
-              coordinates.push(h);
-              let c = decodeGeoHash(h);
-              var marker = new google.maps.Marker({
-                position: c,
-                icon: { path: google.maps.SymbolPath.CIRCLE, scale: 3 },
-                draggable: false,
-                map: map
-              });
-            });
-        }
+        coordinates.forEach(h => {
+          let c = decodeGeoHash(h);
+          var marker = new google.maps.Marker({
+            position: c,
+            icon: { path: google.maps.SymbolPath.CIRCLE, scale: 3 },
+            draggable: false,
+            map: map
+          });
+        });
       });
       function createGpx(reverse) {
         let gpx = [];
