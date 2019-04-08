@@ -54,14 +54,14 @@
     <script>
       const coordinates = []
       document.addEventListener('DOMContentLoaded', function() {
-        var hide = [
+        let hide = [
           {
             featureType: 'all',
             elementType: 'labels',
             stylers: [{visibility: 'off'}]
           }
         ]
-        var map = new google.maps.Map(document.getElementById('map'), {
+        let map = new google.maps.Map(document.getElementById('map'), {
           zoom: 19,
           minZoom: 1,
           maxZoom: 19,
@@ -75,7 +75,7 @@
             lat: event.latLng.lat(),
             lng: event.latLng.lng()
           })
-          var marker = new google.maps.Marker({
+          let marker = new google.maps.Marker({
             position: event.latLng,
             icon: {path: google.maps.SymbolPath.CIRCLE, scale: 3},
             draggable: false,
@@ -96,8 +96,8 @@
           })
         }
         gpx.push(`</gpx>`)
-        var data = new Blob(gpx, {type: 'text/plain'})
-        var downloadLink = document.createElement('a')
+        let data = new Blob(gpx, {type: 'text/plain'})
+        let downloadLink = document.createElement('a')
         downloadLink.href = URL.createObjectURL(data)
         downloadLink.setAttribute('download', 'coordinates.gpx')
         downloadLink.click()
