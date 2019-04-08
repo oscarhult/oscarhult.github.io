@@ -52,65 +52,55 @@
     </div>
     <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBxbRlqqOTti0NQbLiEjdVNmwRpOoCbEtQ"></script>
     <script>
-      const coordinates = [];
-      document.addEventListener("DOMContentLoaded", function() {
+      const coordinates = []
+      document.addEventListener('DOMContentLoaded', function() {
         var hide = [
           {
-            featureType: "all",
-            elementType: "labels",
-            stylers: [{ visibility: "off" }]
+            featureType: 'all',
+            elementType: 'labels',
+            stylers: [{visibility: 'off'}]
           }
-        ];
-        var map = new google.maps.Map(document.getElementById("map"), {
+        ]
+        var map = new google.maps.Map(document.getElementById('map'), {
           zoom: 19,
           minZoom: 1,
           maxZoom: 19,
-          center: { lat: 59.37050804589716, lng: 18.003527664532953 },
-          mapTypeId: "hide",
+          center: {lat: 59.37050804589716, lng: 18.003527664532953},
+          mapTypeId: 'hide',
           disableDoubleClickZoom: true
-        });
-        map.mapTypes.set(
-          "hide",
-          new google.maps.StyledMapType(hide, { name: "hide" })
-        );
-        map.addListener("click", function(event) {
+        })
+        map.mapTypes.set('hide', new google.maps.StyledMapType(hide, {name: 'hide'}))
+        map.addListener('click', function(event) {
           coordinates.push({
             lat: event.latLng.lat(),
             lng: event.latLng.lng()
-          });
+          })
           var marker = new google.maps.Marker({
             position: event.latLng,
-            icon: { path: google.maps.SymbolPath.CIRCLE, scale: 3 },
+            icon: {path: google.maps.SymbolPath.CIRCLE, scale: 3},
             draggable: false,
             map: map
-          });
-        });
-      });
+          })
+        })
+      })
       function createGpx(reverse) {
-        let gpx = [];
-        gpx.push(`<?xml version="1.0" encoding="UTF-8" standalone="no" ?>`);
-        gpx.push(
-          `<gpx xmlns="http://www.topografix.com/GPX/1/1" xmlns:gpxx="http://www.garmin.com/xmlschemas/GpxExtensions/v3" xmlns:gpxtpx="http://www.garmin.com/xmlschemas/TrackPointExtension/v1" version="1.1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.topografix.com/GPX/1/1 http://www.topografix.com/GPX/1/1/gpx.xsd http://www.garmin.com/xmlschemas/GpxExtensions/v3 http://www.garmin.com/xmlschemas/GpxExtensionsv3.xsd http://www.garmin.com/xmlschemas/TrackPointExtension/v1 http://www.garmin.com/xmlschemas/TrackPointExtensionv1.xsd">`
-        );
+        let gpx = []
+        gpx.push(`<?xml version="1.0" encoding="UTF-8" standalone="no" ?>`)
+        gpx.push(`<gpx xmlns="http://www.topografix.com/GPX/1/1" xmlns:gpxx="http://www.garmin.com/xmlschemas/GpxExtensions/v3" xmlns:gpxtpx="http://www.garmin.com/xmlschemas/TrackPointExtension/v1" version="1.1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.topografix.com/GPX/1/1 http://www.topografix.com/GPX/1/1/gpx.xsd http://www.garmin.com/xmlschemas/GpxExtensions/v3 http://www.garmin.com/xmlschemas/GpxExtensionsv3.xsd http://www.garmin.com/xmlschemas/TrackPointExtension/v1 http://www.garmin.com/xmlschemas/TrackPointExtensionv1.xsd">`)
         coordinates.forEach((c, i) => {
-          gpx.push(
-            `<wpt lat="${c.lat}" lon="${c.lng}"><name>WP${i}</name></wpt>`
-          );
-        });
+          gpx.push(`<wpt lat="${c.lat}" lon="${c.lng}"><name>WP${i}</name></wpt>`)
+        })
         if (reverse) {
           coordinates.reverse().forEach((c, i) => {
-            gpx.push(
-              `<wpt lat="${c.lat}" lon="${c.lng}"><name>WP${coordinates.length +
-                i}</name></wpt>`
-            );
-          });
+            gpx.push(`<wpt lat="${c.lat}" lon="${c.lng}"><name>WP${coordinates.length + i}</name></wpt>`)
+          })
         }
-        gpx.push(`</gpx>`);
-        var data = new Blob(gpx, { type: "text/plain" });
-        var downloadLink = document.createElement("a");
-        downloadLink.href = URL.createObjectURL(data);
-        downloadLink.setAttribute("download", "coordinates.gpx");
-        downloadLink.click();
+        gpx.push(`</gpx>`)
+        var data = new Blob(gpx, {type: 'text/plain'})
+        var downloadLink = document.createElement('a')
+        downloadLink.href = URL.createObjectURL(data)
+        downloadLink.setAttribute('download', 'coordinates.gpx')
+        downloadLink.click()
       }
     </script>
   </body>
