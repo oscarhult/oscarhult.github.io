@@ -2,6 +2,7 @@
 // Geohash library for Javascript
 // (c) 2008 David Troy
 // Distributed under the MIT License
+PRECISION = 10;
 BITS = [16, 8, 4, 2, 1];
 BASE32 = "0123456789bcdefghjkmnpqrstuvwxyz";
 function refine_interval(interval, cd, mask) {
@@ -41,13 +42,12 @@ function encodeGeoHash(latitude, longitude) {
   var lon = [];
   var bit = 0;
   var ch = 0;
-  var precision = 12;
   lat[0] = -90.0;
   lat[1] = 90.0;
   lon[0] = -180.0;
   lon[1] = 180.0;
   geohash = "";
-  while (geohash.length < precision) {
+  while (geohash.length < PRECISION) {
     if (is_even) {
       mid = (lon[0] + lon[1]) / 2;
       if (longitude > mid) {
