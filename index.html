@@ -106,17 +106,10 @@
           });
         }
         gpx.push(`</gpx>`);
-        var data = new Blob(gpx);
+        var data = new Blob(gpx, { type: "text/plain" });
         var downloadLink = document.createElement("a");
-        downloadLink.setAttribute("download", "coordinates.gpx");
-        downloadLink.setAttribute("id", "coordinates");
-        document.body.appendChild(downloadLink);
-        downloadLink.setAttribute(
-          "href",
-          "data:text/plain;charset=utf-8," + encodeURIComponent(data)
-        );
         downloadLink.href = URL.createObjectURL(data);
-        downloadLink.style.display = "none";
+        downloadLink.setAttribute("download", "coordinates.gpx");
         downloadLink.click();
       }
     </script>
